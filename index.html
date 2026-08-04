@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kyle Weinstein — Source-Enforced Systems</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Kyle Weinstein — engineering projects in verifiable AI research systems.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◆</text></svg>">
+<style>
+  :root{
+    --c-paper:#FAFAF7; --c-paper-alt:#F1EFE9; --c-ink:#111111; --c-ink-soft:#4A4A46;
+    --c-rule-light:#D8D5CC; --c-accent:#FF3B00; --c-t2:#1B6B45; --c-t25:#2E5CC8;
+    --f-mono:"IBM Plex Mono","Space Mono","Courier New",monospace;
+    --f-serif:Georgia,"Times New Roman",serif;
+    --f-sans:"Helvetica Neue",Arial,-apple-system,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --c-paper:#141414; --c-paper-alt:#1C1C1C; --c-ink:#F2F0EA; --c-ink-soft:#A6A29A;
+           --c-rule-light:#333; --c-accent:#FF6236; --c-t2:#5FBF8F; --c-t25:#7FA6F0; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--c-paper);color:var(--c-ink);
+       font-family:var(--f-serif);font-size:17px;line-height:1.6;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:0 28px}
+
+  header{border-bottom:2px solid var(--c-ink);margin-bottom:2px}
+  .rule-thin{border-bottom:1px solid var(--c-rule-light);margin-bottom:56px}
+  .masthead{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;
+            padding:38px 0 16px}
+  h1{font-family:var(--f-mono);font-size:1.5rem;font-weight:700;margin:0;
+     letter-spacing:.02em;text-transform:uppercase}
+  .tagline{font-family:var(--f-mono);font-size:.72rem;color:var(--c-ink-soft);
+           text-transform:uppercase;letter-spacing:.08em}
+
+  .lede{font-size:1.18rem;line-height:1.55;margin:0 0 10px;max-width:60ch}
+  .lede em{font-style:normal;border-bottom:2px solid var(--c-accent);padding-bottom:1px}
+  .sub{color:var(--c-ink-soft);font-size:1rem;max-width:62ch;margin:0 0 56px}
+
+  h2.sec{font-family:var(--f-mono);font-size:.72rem;text-transform:uppercase;
+         letter-spacing:.1em;color:var(--c-ink-soft);font-weight:400;
+         padding-bottom:8px;border-bottom:1px solid var(--c-rule-light);
+         margin:0 0 30px}
+
+  .proj{margin:0 0 52px}
+  .proj-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:6px}
+  .proj-head a.name{font-family:var(--f-mono);font-size:1.06rem;font-weight:700;
+                    color:var(--c-ink);text-decoration:none;
+                    border-bottom:2px solid var(--c-accent);padding-bottom:1px}
+  .proj-head a.name:hover{color:var(--c-accent)}
+  .kind{font-family:var(--f-mono);font-size:.64rem;text-transform:uppercase;
+        letter-spacing:.06em;color:var(--c-ink-soft);border:1px solid var(--c-rule-light);
+        padding:2px 7px;border-radius:2px}
+  .proj p{margin:0 0 14px;max-width:64ch}
+  .proj p.claim{font-size:1.04rem}
+
+  ul.facts{list-style:none;padding:0;margin:0 0 16px;max-width:64ch}
+  ul.facts li{position:relative;padding-left:18px;margin-bottom:7px;
+              font-size:.96rem;color:var(--c-ink-soft)}
+  ul.facts li::before{content:"▸";position:absolute;left:0;color:var(--c-accent);
+                      font-size:.78rem;top:.28em}
+  ul.facts b{color:var(--c-ink);font-weight:600}
+
+  .meta{font-family:var(--f-mono);font-size:.7rem;color:var(--c-ink-soft);
+        display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+  .meta a{color:var(--c-ink-soft)}
+  .meta a:hover{color:var(--c-accent)}
+  .stack{font-family:var(--f-mono);font-size:.68rem;color:var(--c-ink-soft);
+         margin-top:10px;letter-spacing:.02em}
+
+  footer{border-top:1px solid var(--c-rule-light);margin-top:24px;
+         padding:26px 0 60px;font-family:var(--f-mono);font-size:.7rem;
+         color:var(--c-ink-soft);display:flex;flex-wrap:wrap;gap:8px 20px}
+  footer a{color:var(--c-ink-soft)}
+  a{color:var(--c-ink);text-decoration:underline;text-underline-offset:2px}
+  a:hover{color:var(--c-accent)}
+
+  @media (max-width:560px){
+    body{font-size:16px} .wrap{padding:0 20px} h1{font-size:1.25rem}
+    .masthead{padding:28px 0 14px} .rule-thin{margin-bottom:40px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap masthead">
+    <h1>Kyle Weinstein</h1>
+    <span class="tagline">Building Systems for Accelerated Research and Emergent Insights</span>
+  </div>
+</header>
+<div class="rule-thin"></div>
+
+<main class="wrap">
+
+  <p class="lede">
+    I build AI systems where the claims are verified — not because a model
+    says so, but because a machine located the evidence.
+  </p>
+  <p class="sub">
+    Language models are fluent and confident whether or not they are right. My work
+    puts the burden of proof in code: extract deterministically, cite structurally,
+    and verify mechanically, so an unsupported claim fails a test instead of reaching
+    a reader.
+  </p>
+
+  <h2 class="sec">Projects</h2>
+
+  <!-- ── Project 1 ─────────────────────────────────────────────────────── -->
+  <article class="proj">
+    <div class="proj-head">
+      <a class="name" href="https://seerintel.kyleweinstein.dev/">SEER</a>
+      <span class="kind">Research pipeline</span>
+    </div>
+    <p class="claim">
+      An equity research pipeline where every factual claim traces to a specific,
+      dated, tier-labeled primary source. <b>Information sourcing and
+      citation verification are enforced deterministically
+      by code wherever possible to minimize reliance on LLMs,
+      reducing both cost <i>and</i> hallucination risk.</b>
+    </p>
+    <ul class="facts">
+      <li><b>Seven-tier source hierarchy</b> from SEC filings down to unaudited public
+          posts, with market data marked as a point-in-time price fetched at the time of
+          the research.</li>
+      <li><b>Claims are extracted by regex, not by a model.</b> The citation grammar is
+          generated from one module the pipeline and the prompt both import, so they
+          cannot drift apart — the code raises at import if they do.</li>
+      <li><b>Mechanical tie-out with a digit guard.</b> A quoted figure is located in the
+          source by exact search; a one-digit change leaves a ~97%-similar string, so
+          similarity alone would confirm a fabrication. Comparing digits does not.</li>
+      <li><b>The audit separates proven from judged</b> instead of averaging them into one
+          reassuring number, and deep-links each proven claim to the exact sentence in
+          the filing.</li>
+    </ul>
+    <div class="meta">
+      <a href="https://seerintel.kyleweinstein.dev/">Live &rarr;</a>
+      <span>Reports are public; running new research is gated and capped.</span>
+    </div>
+    <div class="stack">Python · FastAPI · Anthropic Claude · SEC EDGAR · Playwright · Railway</div>
+  </article>
+
+  <!-- ── Project 2 ─────────────────────────────────────────────────────── -->
+  <article class="proj">
+    <div class="proj-head">
+      <a class="name" href="https://seerfeed.kyleweinstein.dev/">SEER MVP</a>
+      <span class="kind">Venture MVP · CMU 45-906</span>
+    </div>
+    <p class="claim">
+      The same guarantee, built as a human-first workflow for tracking investment theses,
+      receiving a feed of thesis-pertinent snippets directly from SEC filings, and recording
+      how each snippet supports or contradicts the thesis. It is designed for source-adaptability, cost-efficiency,
+      and auditability, so that every investment decision can be defended by a verifiable chain of evidence.
+    </p>
+    <ul class="facts">
+      <li><b>Built against customer research.</b> A family-office research lead's line —
+          <i>"tie it out or it doesn't go in"</i> — is the specification the code
+          implements, not a slogan added afterward.</li>
+      <li><b>Uncited claims are unrepresentable.</b> Structured output forces every
+          candidate claim to carry a verbatim excerpt and a source pointer at the moment
+          it is drafted, when the writer still knows what it was looking at.</li>
+      <li><b>Two independent checks per claim</b> — mechanical substring tie-out, then a
+          separate model pass judging whether the located excerpt actually supports the
+          claim as written. It catches the real-excerpt, overreaching-claim case.</li>
+      <li><b>Detect and quarantine, never silently fix.</b> Failed claims are excluded
+          from the report body and surfaced with their reason; time-to-draft and cost
+          are stamped into every report.</li>
+    </ul>
+    <div class="meta">
+      <a href="https://seerfeed.kyleweinstein.dev/">Live &rarr;</a>
+    </div>
+    <div class="stack">Python · Structured outputs · SEC EDGAR · Contract-validated JSON · Railway</div>
+  </article>
+
+  <h2 class="sec">Contact</h2>
+  <p class="sub" style="margin-bottom:20px">
+    Carnegie Mellon. Interested in applied AI where:
+    <li>correctness is measurable —
+    research tooling, financial data systems, and verification.</li>
+    <li>insights are emergent, not derivative.</li>
+    <li>design is informed by data and user needs.</li>
+  </p>
+
+</main>
+
+<footer class="wrap">
+  <span>&copy; 2026 Kyle Weinstein</span>
+  <span>kyleweinstein.dev</span>
+</footer>
+
+</body>
+</html>
