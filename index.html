@@ -172,6 +172,39 @@
     <div class="stack">Python · Structured outputs · SEC EDGAR · Contract-validated JSON · Railway</div>
   </article>
 
+  <!-- Project 3 -->
+  <article class="proj">
+    <div class="proj-head">
+      <a class="name" href="https://lab.kyleweinstein.dev/">PORTFOLIO LAB</a>
+      <span class="kind">Portfolio analytics</span>
+    </div>
+    <p class="claim">
+      An interactive laboratory for designing, stress-checking, pairing, and rebalancing
+      long-only portfolios from adjusted daily-close history. It keeps the analytical model
+      transparent while making dense portfolios fast enough to explore directly in the browser.
+    </p>
+    <ul class="facts">
+      <li><b>One diversification map scales continuously.</b> A clustered Canvas explorer moves
+          from portfolio overview to exact pair values through semantic zoom, search, pan, and
+          keyboard navigation instead of switching between portfolio-size-specific designs.</li>
+      <li><b>Large analyses stay off the interface thread.</b> Correlation, classification,
+          clustering, and constrained optimization run in a Web Worker over packed typed arrays,
+          keeping draft editing responsive as holdings grow.</li>
+      <li><b>Pairwise work is reduced to O(N²T).</b> Return series are aligned and standardized
+          once, the upper correlation triangle is stored once, and dependent tools reuse the same
+          matrix rather than rebuilding statistics for every cell.</li>
+      <li><b>Drafts and analyzed results are deliberately separate.</b> Expensive work runs only
+          when requested, prior results remain visible while inputs change, and stale requests
+          cannot overwrite a newer portfolio snapshot.</li>
+    </ul>
+    <div class="meta">
+      <a href="https://lab.kyleweinstein.dev/">Live &rarr;</a>
+      <a href="https://github.com/kyleweinstein/portfolio-laboratory">Source &rarr;</a>
+      <span>Optimized for portfolios of up to 100 holdings.</span>
+    </div>
+    <div class="stack">TypeScript · React · Web Workers · Canvas · Yahoo Finance · Railway</div>
+  </article>
+
   <h2 class="sec">Contact</h2>
   <div class="stack">weinsteinkylem@gmail.com · linkedin.com/in/kyleweinstein</div>
   <ul class="facts">
