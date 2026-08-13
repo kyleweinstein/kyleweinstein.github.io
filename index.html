@@ -401,33 +401,36 @@
   <!-- ── Project 2 ─────────────────────────────────────────────────────── -->
   <article class="proj">
     <div class="proj-head">
-      <a class="name" href="https://seerfeed.kyleweinstein.dev/">SEER DELTA</a>
-      <span class="kind">Intel Tracker · CMU 45-906</span>
+      <a class="name" href="https://web-staging-3bf6.up.railway.app/">SEER DELTA</a>
+      <span class="kind">Evidence review · CMU 45-906</span>
     </div>
     <p class="claim">
-      The same guarantee, built as a human-first workflow for tracking investment theses,
-      receiving a feed of thesis-pertinent snippets directly from SEC filings, and recording
-      how each snippet supports or contradicts the thesis. It is designed for source-adaptability, cost-efficiency,
-      and auditability, so that every investment decision can be defended by a verifiable chain of evidence.
+      An evidence-first equity research workflow that turns SEC filings into thesis-driven
+      reports and a reviewable monitoring queue. The factual report is verbatim source
+      evidence—not AI paraphrase—so each published claim can be traced to a dated,
+      accession-numbered filing.
     </p>
     <ul class="facts">
-      <li><b>Built against customer research.</b> A family-office research lead's line —
-          <i>"tie it out or it doesn't go in"</i> — is the specification the code
-          implements, not a slogan added afterward.</li>
-      <li><b>Uncited claims are unrepresentable.</b> Structured output forces every
-          candidate claim to carry a verbatim excerpt and a source pointer at the moment
-          it is drafted, when the writer still knows what it was looking at.</li>
-      <li><b>Two independent checks per claim</b> — mechanical substring tie-out, then a
-          separate model pass judging whether the located excerpt actually supports the
-          claim as written. It catches the real-excerpt, overreaching-claim case.</li>
-      <li><b>Detect and quarantine, never silently fix.</b> Failed claims are excluded
-          from the report body and surfaced with their reason; time-to-draft and cost
-          are stamped into every report.</li>
+      <li><b>The customer-tested workflow is preserved end to end:</b> watchlist → thesis-driven
+          report → EDGAR sync → review queue → evidence drawer → disposition → audit export.
+          It operationalizes the research standard, <i>"tie it out or it doesn't go in."</i></li>
+      <li><b>Evidence is quote-first.</b> Filing sections are located deterministically; a
+          structured-output model selects relevant verbatim excerpts and classifies them to
+          monitoring dimensions without rewriting the underlying source text.</li>
+      <li><b>Verification is mechanical where it can be.</b> Normalized substring matching and
+          a digit guard reject altered quotations, while explicitly labeled derived analysis
+          receives a separate semantic check. Failures are quarantined for review, never
+          silently corrected into the report.</li>
+      <li><b>The workflow is durable and schedulable.</b> PostgreSQL-backed jobs, reconciliation,
+          and server-owned progress survive navigation and refresh; scheduled EDGAR checks compare
+          accession metadata first, making a no-new-filing result a zero-model-cost no-op.</li>
     </ul>
     <div class="meta">
-      <a href="https://seerfeed.kyleweinstein.dev/">Live &rarr;</a>
+      <a href="https://web-staging-3bf6.up.railway.app/">Live staging &rarr;</a>
+      <a href="https://github.com/kyleweinstein/seer-delta-next/tree/codex/evidence-based-mvp">Source &rarr;</a>
+      <span>Staging MVP; shared access is gated.</span>
     </div>
-    <div class="stack">Python · Structured outputs · SEC EDGAR · Contract-validated JSON · Railway</div>
+    <div class="stack">Python · FastAPI · PostgreSQL · SEC EDGAR · Anthropic Claude · Railway</div>
   </article>
 
   <!-- Project 3 -->
