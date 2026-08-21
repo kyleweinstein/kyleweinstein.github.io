@@ -5,9 +5,11 @@
 <title>Kyle Weinstein — Project Portfolio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Kyle Weinstein — engineering projects in verifiable AI research systems.">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" type="image/svg+xml" href="/seer-favicon.svg?v=faceted-seer-3">
 <style>
   :root {
+    color-scheme: light;
     --c-paper: #FAFAF7;
     --c-paper-alt: #F1EFE9;
     --c-ink: #111111;
@@ -30,6 +32,20 @@
     --page-max: 1200px;
     --content-max: 720px;
     --gutter: 28px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --c-paper: #111110;
+      --c-paper-alt: #1C1C1A;
+      --c-ink: #F4F2EC;
+      --c-ink-soft: #B9B5AB;
+      --c-rule: #F4F2EC;
+      --c-rule-light: #3A3935;
+      --c-accent: #FF5A2A;
+      --c-accent-ink: #111110;
+    }
   }
 
   * { box-sizing: border-box; }
