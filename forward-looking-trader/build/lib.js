@@ -5,7 +5,7 @@ const d = require("docx");
 const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, ShadingType, AlignmentType,
   HeadingLevel, BorderStyle, LevelFormat, Header, Footer, PageNumber, PageBreak, TableOfContents } = d;
 const FONT = "Arial", NAVY = "1F3A5F", GREY = "555555", W = 9360;
-const VERSION = "v1.0 · 16 Nov 2026";
+const VERSION = "v1.1 · 16 Nov 2026 (UTC)";
 
 function runs(text, base = {}) {
   // mini-markup: **bold**, *italic*

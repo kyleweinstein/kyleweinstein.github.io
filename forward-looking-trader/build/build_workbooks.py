@@ -46,7 +46,7 @@ sc = wb.create_sheet("Scenario_Exercise")
 # ---------------- README
 rd.column_dimensions["A"].width = 26; rd.column_dimensions["B"].width = 110
 put(rd, "A1", "01_Forecast_Registry — The Forward-Looking Trader", H1)
-put(rd, "A2", "Version 1.0 · built 16 Nov 2026 · Excel-first; no macros; recalculates in Excel 2010+ and LibreOffice.", NOTE)
+put(rd, "A2", "Version 1.1 · built 16 Nov 2026 (UTC) · Excel-first; no macros; recalculates in Excel 2010+ and LibreOffice.", NOTE)
 rows = [
  ("Purpose", "Record dated, measurable, probabilistic predictions; log every revision (including decisions not to act); score them with the Brier score; and check calibration. Forecast accuracy is scored here independently of P&L."),
  ("Sheets", "Registry = one row per prediction.  Revisions = one row per probability update.  Calibration = scoring summary (all formulas).  Scenario_Exercise = the Lesson 1 worked 18–24-month scenario exercise (hypothetical company)."),
@@ -55,7 +55,7 @@ rows = [
  ("How to revise", "Never overwrite the initial probability. Add a row on Revisions (ID, date, new probability, what changed, action taken — 'no action' is a valid entry). The Registry's 'Current probability' picks up the most recent (lowest-down) revision row for that ID automatically."),
  ("How to resolve", "When the event date passes, type 1 (happened) or 0 (did not happen) in Outcome. Leave blank until then. Rows past their event date without an outcome show OVERDUE."),
  ("Brier score", "For one binary prediction: (p − o)², where p is the probability assigned to 'yes' and o is 1 or 0. Range 0 (perfect) to 1 (certain and wrong). Always saying 50% scores 0.25. Lower is better. Mean Brier = average across resolved predictions. (Brier 1950, one-sided binary form.)"),
- ("Skill vs base rate", "Brier skill = 1 − (your mean Brier ÷ reference mean Brier). Positive = you beat the reference. Two references are shown: your own recorded base rates, and the 'climatology' forecast that always states the observed frequency of yes outcomes."),
+ ("Skill vs base rate", "Brier skill = 1 − (your mean Brier ÷ reference mean Brier). Positive = you beat the reference. Three references are shown: always saying 50% (score 0.250, the fair no-information benchmark and the one to quote); your own recorded base rates; and the observed frequency of yes outcomes, which is only known after the fact and is therefore a hindsight benchmark."),
  ("Calibration table", "Resolved predictions are grouped into ten probability bins on the final (current) probability. If you are well calibrated, things you call 70% happen about 70% of the time. With fewer than ~10 predictions per bin the table is noise: read it as a habit-builder, not a verdict."),
  ("Decomposition", "Murphy (1973): Brier = Reliability − Resolution + Uncertainty. This holds exactly only when all forecasts inside a bin are identical; the 'Decomposition residual' cell shows the within-bin difference."),
  ("Definitions kept distinct", "Probability = your numeric estimate that a stated event occurs by a stated date.  Forecast confidence = how much evidence stands behind that probability (how far it would move on new data).  Conviction = a feeling; never recorded here as a number.  Position size = a risk-budget decision made later (Module 5); it is not a probability."),
@@ -205,8 +205,9 @@ summ = [
  ("Reliability (lower is better)", '=IF(B6=0,"",SUM(H22:H31)/B6)', "0.000"),
  ("Resolution (higher is better)", '=IF(B6=0,"",SUM(I22:I31)/B6)', "0.000"),
  ("Decomposition residual (within-bin)", '=IF(B6=0,"",B8-(B15-B16+B14))', "0.000"),
- ("Brier skill vs climatology", '=IF(OR(B6=0,B14=0),"",1-B8/B14)', "0.0%"),
+ ("Brier skill vs observed frequency (hindsight benchmark)", '=IF(OR(B6=0,B14=0),"",1-B8/B14)', "0.0%"),
  ("Brier skill vs your base rates", '=IF(OR(B6=0,B10="",B10=0),"",1-B8/B10)', "0.0%"),
+ ("Brier skill vs always saying 50% (0.250)", '=IF(B6=0,"",1-B8/0.25)', "0.0%"),
 ]
 for k, (a, f, fmt) in enumerate(summ):
     put(cal, f"A{5+k}", a); put(cal, f"B{5+k}", f, GRN, fmt)
@@ -236,7 +237,7 @@ for k, b in enumerate([3, 6, 12, 18, 24]):
     put(cal, f"B{r}", f'=COUNTIFS({Hh},A{r},{O},">=0")', GRN, "0")
     put(cal, f"C{r}", f'=IF(B{r}=0,"",SUMIFS({Rr},{Hh},A{r},{O},">=0")/B{r})', GRN, "0.000")
     put(cal, f"D{r}", f'=IF(B{r}=0,"",SUMIFS({Q},{Hh},A{r},{O},">=0")/B{r})', GRN, "0.000")
-put(cal, "A43", "Reference points: always-50% forecaster scores 0.250. A forecaster who always states the observed frequency scores the Uncertainty value in B14.", NOTE)
+put(cal, "A43", "Reference points: always-50% forecaster scores 0.250. A forecaster who always states the observed frequency scores the Uncertainty value in B14, but that frequency is only known in hindsight.", NOTE)
 
 # ---------------- Scenario exercise
 for i, w in enumerate([46, 16, 16, 16, 20, 58], 1): sc.column_dimensions[L(i)].width = w
@@ -269,7 +270,7 @@ inp(19, "Net debt", 200, "$#,##0", "$ m")
 inp(20, "Interest rate on net debt", 0.06, "0.0%")
 inp(21, "Tax rate (on positive pre-tax income only)", 0.25, "0.0%", "", "No tax credit is booked on losses (conservative simplification).")
 inp(22, "Diluted shares", 50, "#,##0.0", "m")
-inp(23, "Share price today", 4.5, "$#,##0.00", "$")
+inp(23, "Share price today", 3.0, "$#,##0.00", "$")
 put(sc, "A24", "Present economics (what the screen shows today)", BOLD, fill=SUB)
 calc(25, "Revenue", "=B16*B14/1000", "$#,##0.0", "$ m")
 calc(26, "EBIT", "=B16*(B14-B17)/1000-B18", "$#,##0.0;($#,##0.0)", "$ m")
@@ -279,6 +280,7 @@ calc(29, "Net income", "=B28-MAX(0,B28)*B21", "$#,##0.0;($#,##0.0)", "$ m")
 calc(30, "EPS", "=B29/B22", "$0.000;($0.000)", "$")
 calc(31, "P/E on present earnings", '=IF(B30>0,B23/B30,"n.m.")', "0.0x", "", "The 'present' view: the stock looks very expensive on trough earnings.")
 put(sc, "A32", "Global mechanism assumptions", BOLD, fill=SUB)
+calc(37, "Enterprise value today (market value + net debt)", "=B22*B23+B19", "$#,##0.0", "$ m", "Net debt is more than half of enterprise value: equity is the thin, leveraged slice.")
 inp(33, "Practical maximum utilisation", 0.95, "0.0%")
 inp(34, "Price sensitivity k", 1.5, "0.00", "", "% change in price per 1 percentage point change in utilisation. The key causal assumption — stress it.")
 inp(35, "Variable-cost inflation to forecast date", 0.04, "0.0%")
@@ -299,8 +301,8 @@ def crow(r, label, tmpl, fmt, note="", e=None, efmt=None, bold=False):
 srow(40, "Probability", [0.35, 0.40, 0.25], "0%", "Must sum to 100%. Record these in the Registry before modelling prices.", '=IF(ABS(SUM(B40:D40)-1)<0.0001,"OK: sums to 100%","ERROR: probabilities must sum to 100%")')
 srow(41, "Demand change to forecast date", [0.06, 0.02, -0.08], "+0.0%;-0.0%", "A: grid/power orders grow. C: substitution takes volume.")
 srow(42, "Capacity change to forecast date", [-0.08, -0.03, -0.04], "+0.0%;-0.0%", "Closures already announced vs. actually executed; no additions possible inside the lead time.")
-srow(43, "Multiple the market pays on that EPS in that state", [10, 13, 8], "0.0x", "Cyclicals usually get LOWER multiples on high earnings. An explicit judgement — Week 11 replaces it with a reverse DCF.")
-srow(44, "Floor value per share if EPS ≤ 0", [1.5, 1.5, 1.5], "$0.00", "Distress/asset-value placeholder used when earnings cannot be capitalised.")
+srow(43, "EV/EBIT multiple the market pays in that state", [7, 9, 6], "0.0x", "Applied to EBIT to get ENTERPRISE value; debt is deducted afterwards. Cyclicals usually get LOWER multiples on high earnings. A judgement — Week 11 replaces it with a reverse DCF.")
+srow(44, "Distressed enterprise value floor ($m)", [150, 150, 150], "$#,##0", "What the assets might fetch for ALL claimants if earnings cannot be capitalised. It is below net debt here, so equity is worth zero in that case.")
 put(sc, "A45", "Mechanics", BOLD, fill=SUB)
 crow(46, "Industry demand (kt)", "=$B$12*(1+#41)", "#,##0.0")
 crow(47, "Industry capacity (kt)", "=$B$11*(1+#42)", "#,##0.0")
@@ -315,41 +317,44 @@ crow(55, "EBIT ($m)", "=#52*(#50-#51)/1000-#54", "$#,##0.0;($#,##0.0)")
 crow(56, "Interest ($m)", "=$B$27", "$#,##0.0", "Net debt held constant (simplification: ignores cash build/burn on the path).")
 crow(57, "Pre-tax income ($m)", "=#55-#56", "$#,##0.0;($#,##0.0)")
 crow(58, "Net income ($m)", "=#57-MAX(0,#57)*$B$21", "$#,##0.0;($#,##0.0)")
-crow(59, "EPS ($)", "=#58/$B$22", "$0.00;($0.00)", "", "=SUMPRODUCT(B40:D40,B59:D59)", bold=True)
-crow(60, "Value per share at forecast date ($)", "=IF(#59>0,MAX(#59*#43,#44),#44)", "$0.00", "Undiscounted value at the forecast date.", "=SUMPRODUCT(B40:D40,B60:D60)", bold=True)
-crow(61, "Return vs today's price", "=#60/$B$23-1", "+0.0%;-0.0%", "", "=E60/$B$23-1", bold=True)
-crow(62, "P/E at TODAY's price on FUTURE EPS", '=IF(#59>0,$B$23/#59,"n.m.")', "0.0x", "The 'future' view of the same stock.")
-sec(64, "4. From forecast to price: is there a gap?")
-calc(65, "Expected value per share", "=SUMPRODUCT(B40:D40,B60:D60)", "$0.00", "", "Σ probability × value.", True)
-calc(66, "Expected return to forecast date", "=B65/B23-1", "+0.0%;-0.0%")
-calc(67, "Annualised expected return", "=(1+B66)^(12/B6)-1", "+0.0%;-0.0%", "", "If recognition takes the whole horizon. Earlier recognition raises it; that is a timing question, not a forecast question.")
-calc(68, "Probability the position loses money", "=SUMPRODUCT((B60:D60<B23)*B40:D40)", "0%", "", "A positive expected value can coexist with a better-than-even chance of loss.")
-calc(69, "Return in the single most likely state", "=INDEX(B61:D61,MATCH(MAX(B40:D40),B40:D40,0))", "+0.0%;-0.0%")
-calc(70, "Probability-weighted upside per share", "=SUMPRODUCT((B60:D60>B23)*B40:D40*(B60:D60-B23))", "$0.00")
-calc(71, "Probability-weighted downside per share", "=SUMPRODUCT((B60:D60<B23)*B40:D40*(B23-B60:D60))", "$0.00")
-calc(72, "Upside / downside ratio", '=IF(B71=0,"n.m.",B70/B71)', "0.00x")
-calc(73, "Value if A does NOT happen (B and C at your relative odds)", "=(C40*C60+D40*D60)/(C40+D40)", "$0.00")
-calc(74, "Market-implied (break-even) probability of A", "=(B23-B73)/(B60-B73)", "0.0%", "", "The probability of A at which today's price equals expected value, taking your state values as given.", True)
-calc(75, "Your probability of A minus market-implied", "=B40-B74", "+0.0%;-0.0%", "", "Your entire edge in this framing. Is your evidence worth this many points?", True)
-sec(77, "5. Sensitivity: move probability between A and C")
-hdr(sc, 78, ["Points moved from C to A", "P(A)", "P(C)", "Expected value", "Expected return", ""])
+crow(59, "EPS ($)", "=#58/$B$22", "$0.00;($0.00)", "Tax is charged only on positive pre-tax income; losses get no tax credit.", "=SUMPRODUCT(B40:D40,B59:D59)", bold=True)
+crow(60, "Net debt at forecast date ($m)", "=$B$19-($B$6/12)*($B$29+#58)/2", "$#,##0.0", "Today's net debt less cumulative net income on the way there (average of today's and the state's run-rate). Assumes capex = depreciation and no dividends.")
+crow(61, "Enterprise value ($m)", "=MAX(#55*#43,#44)", "$#,##0.0", "EBIT x EV/EBIT multiple, or the distressed floor if that is higher.")
+crow(62, "Equity value ($m)", "=MAX(0,#61-#60)", "$#,##0.0", "Debt is paid first. Equity can be zero.")
+crow(63, "Value per share at forecast date ($)", "=#62/$B$22", "$0.00", "Undiscounted value at the forecast date.", "=SUMPRODUCT(B40:D40,B63:D63)", bold=True)
+crow(64, "Return vs today's price", "=#63/$B$23-1", "+0.0%;-0.0%", "", "=E63/$B$23-1", bold=True)
+crow(65, "P/E at TODAY's price on FUTURE EPS", '=IF(#59>0,$B$23/#59,"n.m.")', "0.0x", "The 'future' view of the same stock.")
+sec(67, "4. From forecast to price: is there a gap?")
+calc(68, "Expected value per share", "=SUMPRODUCT(B40:D40,B63:D63)", "$0.00", "", "Sum of probability x value.", True)
+calc(69, "Expected return to forecast date", "=B68/B23-1", "+0.0%;-0.0%")
+calc(70, "Annualised expected return", "=(1+B69)^(12/B6)-1", "+0.0%;-0.0%", "", "If recognition takes the whole horizon. Earlier recognition raises it; that is a timing question, not a forecast question.")
+calc(71, "Probability the position loses money", "=SUMPRODUCT((B63:D63<B23)*B40:D40)", "0%", "", "A positive expected value can coexist with a better-than-even chance of loss.")
+calc(72, "Return in the single most likely state", "=INDEX(B64:D64,MATCH(MAX(B40:D40),B40:D40,0))", "+0.0%;-0.0%")
+calc(73, "Probability-weighted upside per share", "=SUMPRODUCT((B63:D63>B23)*B40:D40*(B63:D63-B23))", "$0.00")
+calc(74, "Probability-weighted downside per share", "=SUMPRODUCT((B63:D63<B23)*B40:D40*(B23-B63:D63))", "$0.00")
+calc(75, "Upside / downside ratio", '=IF(B74=0,"n.m.",B73/B74)', "0.00x")
+calc(76, "Value if A does NOT happen (B and C at your relative odds)", "=(C40*C63+D40*D63)/(C40+D40)", "$0.00")
+calc(77, "Break-even probability of A", '=IF(B63<=B76,"n.m.",IF(OR((B23-B76)/(B63-B76)<0,(B23-B76)/(B63-B76)>1),"n.m.",(B23-B76)/(B63-B76)))', "0.0%", "", "The P(A) at which today's price equals expected value, holding YOUR state values and YOUR B:C odds fixed. A break-even test of your own model, not a pure reading of the market. Shows n.m. when A is not the favourable state or the result falls outside 0-100%.", True)
+calc(78, "Your probability of A minus break-even", '=IF(ISNUMBER(B77),B40-B77,"n.m.")', "+0.0%;-0.0%", "", "Your edge in this framing. Is your evidence worth this many points?", True)
+sec(80, "5. Sensitivity: move probability between A and C")
+hdr(sc, 81, ["Points moved from C to A", "P(A)", "P(C)", "Expected value", "Expected return", ""])
 for k, sh in enumerate([-0.15, -0.10, -0.05, 0, 0.05, 0.10]):
-    r = 79 + k
+    r = 82 + k
     c = put(sc, f"A{r}", sh, BLUE, "+0%;-0%;0%", INP); c.border = BOX
     put(sc, f"B{r}", f"=$B$40+A{r}", BLK, "0%"); put(sc, f"C{r}", f"=$D$40-A{r}", BLK, "0%")
-    put(sc, f"D{r}", f"=$B$65+A{r}*($B$60-$D$60)", BLK, "$0.00"); put(sc, f"E{r}", f"=D{r}/$B$23-1", BLK, "+0.0%;-0.0%")
+    put(sc, f"D{r}", f"=$B$68+A{r}*($B$63-$D$63)", BLK, "$0.00"); put(sc, f"E{r}", f"=D{r}/$B$23-1", BLK, "+0.0%;-0.0%")
     put(sc, f"F{r}", f'=IF(OR(B{r}<0,C{r}<0),"invalid: negative probability","")', NOTE)
-sec(86, "6. Your written answers (type here)")
-qs = ["Proposition 1 — What would make the demand forecast right but industry profitability wrong?",
-      "Proposition 2 — What does today's price already assume? (Use B74.)",
-      "Proposition 3 — What could make the value right but the trade fail (timing, liquidity, leverage, path)?",
-      "Leading indicators you will watch, with Registry IDs (L-001 … L-005):",
+sec(89, "6. Your written answers (type here)")
+qs = ["Proposition 1 - What would make the demand forecast right but industry profitability wrong?",
+      "Proposition 2 - What does today's price already assume? (Use B77.)",
+      "Proposition 3 - What could make the value right but the trade fail (timing, liquidity, leverage, path)?",
+      "Leading indicators you will watch, with Registry IDs (L-001 ... L-005):",
       "Evidence that would cut P(A) in half:"]
 for k, q in enumerate(qs):
-    r = 87 + k
+    r = 90 + k
     put(sc, f"A{r}", q, BLK, wrap=True); sc.merge_cells(f"B{r}:F{r}")
     c = sc[f"B{r}"]; c.fill = INP; c.font = BLUE; c.alignment = WRAP; sc.row_dimensions[r].height = 48
-put(sc, "A93", "Model limits: one-period snapshot at the forecast date; no discounting; net debt constant; linear price rule; company share of industry volume constant; multiples are judgements. Each is revisited in Modules 2–3.", NOTE)
+put(sc, "A96", "Model limits: one-period snapshot at the forecast date; no discounting; interest charged on today's net debt; cash build approximated from net income; linear price rule; company share of industry volume constant; multiples and the distressed floor are judgements. Each is revisited in Modules 2-3.", NOTE)
 sc.freeze_panes = "B5"
 
 for ws in wb.worksheets:

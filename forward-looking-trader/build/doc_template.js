@@ -33,7 +33,7 @@ const c = [
   NOTE("Unpopular is not mispriced. Low multiple is not cheap. Each row needs a reason grounded in a future state."),
   H1("6. Reverse current pricing"),
   ...T(null, [["Price / market value (dated)", "[ ]"], ["Value per share in each state", "A: [ ]   B: [ ]   C: [ ]"], ["Expected value and expected return", "[ ]"],
-    ["Probability of loss; return in most likely state", "[ ]"], ["Market-implied probability of favoured state", "[ ]"], ["My edge in probability points", "[ ]"],
+    ["Probability of loss; return in most likely state", "[ ]"], ["Enterprise value, net debt and equity value in each state", "[ ]"], ["Break-even probability of favoured state (state the odds it depends on)", "[ ]"], ["My edge in probability points", "[ ]"],
     ["What must be true for today’s price", "[growth, margin, reinvestment or multiple implied — full reverse DCF from Week 11]"]], [3600, 5760]),
   H1("7. Tests: prediction ladder and disconfirmation"),
   ...T(["Rung", "Dated yes/no prediction", "Probability", "Resolution source", "Registry ID"], [["3 months", " ", " ", " ", " "], ["6 months", " ", " ", " ", " "], ["12 months", " ", " ", " ", " "], ["18 months", " ", " ", " ", " "], ["24 months", " ", " ", " ", " "]], [1100, 4060, 1100, 1900, 1200]),

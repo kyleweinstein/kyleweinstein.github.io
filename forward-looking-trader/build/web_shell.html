@@ -99,7 +99,7 @@ td input{padding:4px 6px;font-size:.84rem;text-align:right;min-width:72px}
       <label>Fixed cost ($m)<input type="number" id="l-fc" step="1"></label>
       <label>Net debt ($m)<input type="number" id="l-debt" step="10"></label>
     </div>
-    <p class="note">Fixed in this lab: company capacity 200 kt, 50m shares, 6% interest, 25% tax, variable costs +4% and fixed costs +3% to the forecast date, utilisation capped at 95%. k is the % change in price for each 1-point change in industry utilisation.</p>
+    <p class="note">Fixed in this lab: company capacity 200 kt, 50m shares, 6% interest, 25% tax on profits only (losses get no tax credit), variable costs +4% and fixed costs +3% to the forecast date, utilisation capped at 95%. k is the % change in price for each 1-point change in industry utilisation.</p>
     <div class="stats" id="l-now"></div>
   </div>
   <div class="tool"><h3>Three future states</h3>
@@ -111,7 +111,7 @@ td input{padding:4px 6px;font-size:.84rem;text-align:right;min-width:72px}
     <h4>Move probability between A and C</h4>
     <div class="tw"><table id="l-sens"></table></div>
     <div class="btns"><button id="l-reset">Reset to the lesson's base case</button></div>
-    <p class="note">One-period, undiscounted snapshot at the forecast date. Net debt and the company's share of industry volume are held constant; multiples are judgements. Modules 2 and 3 replace each simplification.</p>
+    <p class="note">Each state is valued as a whole enterprise (EBIT × multiple, or the distress value if higher). Net debt is rolled forward by the net income earned on the way, lenders are paid first, and shareholders get what is left, which can be zero. The break-even probability holds your own values and your B-to-C odds fixed, so it tests your model and is not a pure reading of the market; it shows as not defined when A is not the favourable state. One-period, undiscounted snapshot; multiples and distress value are judgements.</p>
   </div>
 </section>
 
@@ -122,7 +122,7 @@ td input{padding:4px 6px;font-size:.84rem;text-align:right;min-width:72px}
   <div id="r-msg"></div>
   <div class="tool"><h3>Score</h3><div class="stats" id="r-stats"></div>
     <div class="tw"><table id="r-cal"></table></div>
-    <p class="note">Brier score = (probability − outcome)², averaged; lower is better and always saying 50% scores 0.250. With fewer than about ten predictions per bin, read the calibration table as a habit-builder, not a verdict.</p></div>
+    <p class="note">Brier score = (probability − outcome)², averaged; lower is better and always saying 50% scores 0.250, which is the benchmark to beat. The observed-rate comparison uses a frequency only known afterward, so it is a hindsight check and is blank when every outcome is the same. With fewer than about ten predictions per bin, read the calibration table as a habit-builder, not a verdict.</p></div>
   <div class="tool"><h3>Add a prediction</h3>
     <form id="r-form">
       <label>Question with one unambiguous yes/no answer<textarea id="r-q" required></textarea></label>
@@ -163,17 +163,17 @@ function route(){let h=(location.hash||"").slice(1);if(!views.includes(h))h="les
 window.addEventListener("hashchange",route);route();
 
 /* ---------- scenario lab ---------- */
-const BASE={price:4.5,k:1.5,cap:1000,dem:780,p0:2000,vc:1450,fc:70,debt:200,
-  s:[{n:"A · Tightening",p:35,d:6,c:-8,m:10,f:1.5},{n:"B · Slow heal",p:40,d:2,c:-3,m:13,f:1.5},{n:"C · Secular fade",p:25,d:-8,c:-4,m:8,f:1.5}]};
+const BASE={price:3,k:1.5,cap:1000,dem:780,p0:2000,vc:1450,fc:70,debt:200,
+  s:[{n:"A · Tightening",p:35,d:6,c:-8,m:7,f:150},{n:"B · Slow heal",p:40,d:2,c:-3,m:9,f:150},{n:"C · Secular fade",p:25,d:-8,c:-4,m:6,f:150}]};
 let L=JSON.parse(JSON.stringify(BASE));
-const CC=200,SH=50,RATE=.06,TAX=.25,VINF=.04,FINF=.03,UMAX=.95;
+const CC=200,SH=50,RATE=.06,TAX=.25,VINF=.04,FINF=.03,UMAX=.95,YRS=21/12;
 const money=(x,d=2)=>(x<0?"−$":"$")+Math.abs(x).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
 const pct=(x,d=1)=>(x<0?"−":"")+Math.abs(x*100).toFixed(d)+"%";
 const spct=(x,d=1)=>(x>0?"+":"")+pct(x,d);
 function econ(util,price,vc,fc){const vol=CC*Math.min(util,UMAX),ebit=vol*(price-vc)/1000-fc,pt=ebit-L.debt*RATE,ni=pt-Math.max(0,pt)*TAX;return{vol,ebit,ni,eps:ni/SH}}
 function calc(){const u0=L.dem/L.cap,now=econ(u0,L.p0,L.vc,L.fc);
   const st=L.s.map(s=>{const dem=L.dem*(1+s.d/100),cap=L.cap*(1+s.c/100),u=dem/cap,price=L.p0*(1+L.k*(u-u0));
-    const e=econ(u,price,L.vc*(1+VINF),L.fc*(1+FINF));const val=e.eps>0?Math.max(e.eps*s.m,s.f):s.f;return{...s,u,price,...e,val,ret:val/L.price-1,pr:s.p/100}});
+    const e=econ(u,price,L.vc*(1+VINF),L.fc*(1+FINF));const nd=L.debt-YRS*(now.ni+e.ni)/2,ev=Math.max(e.ebit*s.m,s.f),eq=Math.max(0,ev-nd),val=eq/SH;return{...s,u,price,...e,nd,ev,eq,val,ret:val/L.price-1,pr:s.p/100}});
   const sum=st.reduce((a,s)=>a+s.pr,0),ev=st.reduce((a,s)=>a+s.pr*s.val,0);
   const notA=(st[1].pr+st[2].pr)>0?(st[1].pr*st[1].val+st[2].pr*st[2].val)/(st[1].pr+st[2].pr):NaN;
   const imp=(L.price-notA)/(st[0].val-notA);
@@ -183,18 +183,18 @@ function calc(){const u0=L.dem/L.cap,now=econ(u0,L.p0,L.vc,L.fc);
   return{u0,now,st,sum,ev,notA,imp,ploss,up,dn,modal}}
 function stat(label,value,cls){return `<div class="stat ${cls||""}"><b>${value}</b><span>${label}</span></div>`}
 function labInputs(){["price","k","cap","dem","p0","vc","fc","debt"].forEach(k=>{$("l-"+k).value=L[k]});
-  const rows=[["Probability (%)","p",1],["Demand change (%)","d",1],["Capacity change (%)","c",1],["Multiple on that EPS (×)","m",.5],["Floor value if EPS ≤ 0 ($)","f",.1]];
+  const rows=[["Probability (%)","p",1],["Demand change (%)","d",1],["Capacity change (%)","c",1],["EV/EBIT multiple (×)","m",.5],["Distress value of the whole business ($m)","f",10]];
   $("l-table").innerHTML=`<thead><tr><th></th>${L.s.map(s=>`<th>${s.n}</th>`).join("")}</tr></thead><tbody>`+
    rows.map(([lab,key,step])=>`<tr><td>${lab}</td>${L.s.map((s,i)=>`<td><input type="number" id="l-s${i}-${key}" data-i="${i}" data-k="${key}" step="${step}" value="${s[key]}" aria-label="${lab}, scenario ${s.n}"></td>`).join("")}</tr>`).join("")+
-   ["Utilisation","Contract price","EBIT ($m)","EPS","Value per share","Return vs today","P/E today on future EPS"].map((lab,r)=>`<tr><td>${lab}</td>${L.s.map((s,i)=>`<td class="num" id="l-o${r}-${i}"></td>`).join("")}</tr>`).join("")+"</tbody>"}
+   ["Utilisation","Contract price","EBIT ($m)","EPS","Enterprise value ($m)","Net debt then ($m)","Equity value ($m)","Value per share","Return vs today","P/E today on future EPS"].map((lab,r)=>`<tr><td>${lab}</td>${L.s.map((s,i)=>`<td class="num" id="l-o${r}-${i}"></td>`).join("")}</tr>`).join("")+"</tbody>"}
 function labRender(){const R=calc();
-  $("l-now").innerHTML=stat("Utilisation today",pct(R.u0))+stat("EPS today",money(R.now.eps,3))+stat("P/E on present earnings",R.now.eps>0?(L.price/R.now.eps).toFixed(1)+"×":"n.m.");
-  R.st.forEach((s,i)=>{const o=[pct(s.u),money(s.price,0),money(s.ebit,1),money(s.eps),money(s.val),`<span class="${s.ret>=0?"pos":"neg"}">${spct(s.ret)}</span>`,s.eps>0?(L.price/s.eps).toFixed(1)+"×":"n.m."];o.forEach((v,r)=>{$(`l-o${r}-${i}`).innerHTML=v})});
+  $("l-now").innerHTML=stat("Utilisation today",pct(R.u0))+stat("EPS today",money(R.now.eps,3))+stat("P/E on present earnings",R.now.eps>0?(L.price/R.now.eps).toFixed(1)+"×":"n.m.")+stat("Enterprise value today ($m)",money(L.price*SH+L.debt,0))+stat("Net debt as share of enterprise value",pct(L.debt/(L.price*SH+L.debt),0));
+  R.st.forEach((s,i)=>{const o=[pct(s.u),money(s.price,0),money(s.ebit,1),money(s.eps),money(s.ev,1),money(s.nd,1),money(s.eq,1),money(s.val),`<span class="${s.ret>=0?"pos":"neg"}">${spct(s.ret)}</span>`,s.eps>0?(L.price/s.eps).toFixed(1)+"×":"n.m."];o.forEach((v,r)=>{$(`l-o${r}-${i}`).innerHTML=v})});
   const ok=Math.abs(R.sum-1)<1e-6;$("l-err").textContent=ok?"":"Probabilities must sum to 100%. They currently sum to "+(R.sum*100).toFixed(0)+"%, so the results below are not valid.";
   const er=R.ev/L.price-1,impOk=isFinite(R.imp)&&R.st[0].val>R.notA&&R.imp>=0&&R.imp<=1;
   $("l-out").innerHTML=stat("Expected value per share",money(R.ev),"key")+stat("Expected return to forecast date",spct(er),er>=0?"good":"bad")+stat("Annualised over 21 months",spct(Math.pow(1+er,12/21)-1))+
    stat("Probability of loss",pct(R.ploss,0),R.ploss>.5?"bad":"")+stat("Return in most likely state",spct(R.modal.ret),R.modal.ret>=0?"good":"bad")+stat("Upside ÷ downside",R.dn>0?(R.up/R.dn).toFixed(2)+"×":"n.m.")+
-   stat("Market-implied probability of A",impOk?pct(R.imp):"n.m.","key")+stat("Your edge in probability points",impOk?spct(R.st[0].pr-R.imp).replace("%"," pts"):"n.m.","key");
+   stat("Break-even probability of A",impOk?pct(R.imp):"not defined","key")+stat("Your edge in probability points",impOk?spct(R.st[0].pr-R.imp).replace("%"," pts"):"n.m.","key");
   $("l-sens").innerHTML="<thead><tr><th>Points moved from C to A</th><th>P(A)</th><th>P(C)</th><th>Expected value</th><th>Expected return</th></tr></thead><tbody>"+
    [-15,-10,-5,0,5,10].map(sh=>{const pa=R.st[0].pr+sh/100,pc=R.st[2].pr-sh/100;if(pa<0||pc<0)return `<tr><td class="num">${sh>0?"+":""}${sh}</td><td colspan="4">not possible from these probabilities</td></tr>`;
      const ev=R.ev+sh/100*(R.st[0].val-R.st[2].val),r=ev/L.price-1;return `<tr><td class="num">${sh>0?"+":""}${sh}</td><td class="num">${pct(pa,0)}</td><td class="num">${pct(pc,0)}</td><td class="num">${money(ev)}</td><td class="num ${r>=0?"pos":"neg"}">${spct(r)}</td></tr>`}).join("")+"</tbody>"}
@@ -217,7 +217,7 @@ function rRender(){
   const withBase=res.filter(p=>typeof p.baseRate==="number"),bB=withBase.length?withBase.reduce((a,p)=>a+Math.pow(p.baseRate-p.outcome,2),0)/withBase.length:NaN;
   const f3=x=>isFinite(x)?x.toFixed(3):"—";
   $("r-stats").innerHTML=stat("Predictions",preds.length)+stat("Resolved",n)+stat("Mean Brier, final probability",f3(bF),"key")+stat("Mean Brier, initial probability",f3(bI))+stat("Mean Brier, your base rates",f3(bB))+
-    stat("Skill vs always saying the observed rate",n&&unc>0?spct(1-bF/unc,0):"—",n&&unc>0?(bF<unc?"good":"bad"):"");
+    stat("Skill vs always saying 50%",n?spct(1-bF/.25,0):"—",n?(bF<.25?"good":"bad"):"")+stat("Skill vs observed rate (hindsight)",n&&unc>0?spct(1-bF/unc,0):"—");
   let rows="";for(let k=0;k<10;k++){const lo=k/10,hi=k===9?1.0001:(k+1)/10,b=res.filter(p=>cur(p)>=lo&&cur(p)<hi);if(!b.length)continue;
     const mf=b.reduce((a,p)=>a+cur(p),0)/b.length,of=b.reduce((a,p)=>a+p.outcome,0)/b.length,g=of-mf;
     rows+=`<tr><td>${k*10}–${(k+1)*10}%</td><td class="num">${b.length}</td><td class="num">${pct(mf,0)}</td><td class="num">${pct(of,0)}</td><td class="num ${Math.abs(g)>.1?(g>0?"pos":"neg"):""}">${spct(g,0)}</td></tr>`}
@@ -262,7 +262,7 @@ $("r-asof").value=today();rRender();$("r-list").innerHTML='<p class="note">Loadi
 (async function(){
   loadTimer=setTimeout(()=>{rMsg("Saved predictions can't be reached yet. They will appear here when the connection returns.")},10000);
   let db=null;try{db=window.claude&&window.claude.use?await window.claude.use("db"):null}catch(e){db=null}
-  if(!db){clearTimeout(loadTimer);rMsg("Saved predictions are not available in this view. Open the page signed in to claude.ai to use the registry.");preds=[];rRender();return}
+  if(!db){clearTimeout(loadTimer);rMsg("Saved predictions are not available in this view. This happens when the page is opened as a saved or downloaded copy. Open it from its claude.ai link while signed in and the registry, including the example rows the lesson refers to, will load.");preds=[];rRender();return}
   col=db.collection("predictions");
   col.onSnapshot(snap=>{preds=snap.docs.map(d=>Object.assign({_id:d.id},d.data()));if(!snap.metadata.fromCache){clearTimeout(loadTimer);rMsg("")}
     if(openForm&&$("rv-p")&&document.activeElement&&document.activeElement.closest(".inline"))return;rRender()},
