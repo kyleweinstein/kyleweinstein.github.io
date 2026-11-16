@@ -1,4 +1,5 @@
 // Shared docx helpers for The Forward-Looking Trader documents.
+if (process.env.FLT_HTML) { module.exports = require("./lib_html.js"); return; }
 const fs = require("fs");
 const d = require("docx");
 const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, ShadingType, AlignmentType,
